@@ -4,6 +4,10 @@ namespace Mortezaa97\Inventories;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Mortezaa97\Inventories\Models\Inventory;
+use Mortezaa97\Inventories\Models\InventoryLog;
+use Mortezaa97\Inventories\Policies\InventoryPolicy;
+use Mortezaa97\Inventories\Policies\InventoryLogPolicy;
 
 class InventoriesServiceProvider extends ServiceProvider
 {
@@ -12,10 +16,15 @@ class InventoriesServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // Load migrations from package
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        
+        // Load routes from package
         $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
 
-        // Gate::policy(Inventory::class, InventoryPolicy::class); // TODO: Implement inventory policy
+        // Register policies
+        Gate::policy(Inventory::class, InventoryPolicy::class);
+        Gate::policy(InventoryLog::class, InventoryLogPolicy::class);
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
@@ -42,3 +51,4 @@ class InventoriesServiceProvider extends ServiceProvider
         });
     }
 }
+

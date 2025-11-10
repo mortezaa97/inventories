@@ -1,20 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Mortezaa97\Brands;
+namespace Mortezaa97\Inventories;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
-use Mortezaa97\Brands\Filament\Resources\Brands\BrandResource;
+use Mortezaa97\Inventories\Filament\Resources\Inventories\InventoryResource;
+use Mortezaa97\Inventories\Filament\Resources\InventoryLogs\InventoryLogResource;
 
 class InventoriesPlugin implements Plugin
 {
-    public static function make(): static
-    {
-        return app(static::class);
-    }
-
     public function getId(): string
     {
         return 'inventories';
@@ -24,12 +18,26 @@ class InventoriesPlugin implements Plugin
     {
         $panel
             ->resources([
-                // 'BrandResource' => BrandResource::class,
+                InventoryResource::class,
+                InventoryLogResource::class,
             ]);
     }
 
     public function boot(Panel $panel): void
     {
         //
+    }
+
+    public static function make(): static
+    {
+        return app(static::class);
+    }
+
+    public static function get(): static
+    {
+        /** @var static $plugin */
+        $plugin = filament(app(static::class)->getId());
+
+        return $plugin;
     }
 }

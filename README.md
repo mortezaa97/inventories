@@ -1,52 +1,167 @@
-# Very short description of the package
+# Inventories Package
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/mortezaa97/inventories.svg?style=flat-square)](https://packagist.org/packages/mortezaa97/inventories)
 [![Total Downloads](https://img.shields.io/packagist/dt/mortezaa97/inventories.svg?style=flat-square)](https://packagist.org/packages/mortezaa97/inventories)
-![GitHub Actions](https://github.com/mortezaa97/inventories/actions/workflows/main.yml/badge.svg)
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what PSRs you support to avoid any confusion with users and contributors.
+A comprehensive Filament plugin for managing inventories and inventory logs with polymorphic tracking, full CRUD interface, and detailed history.
+
+## Features
+
+- 📦 **Inventory Management**: Track stock levels across multiple warehouses
+- 📊 **Inventory Logs**: Complete history of all inventory changes
+- 🔗 **Polymorphic Tracking**: Link inventory changes to any model (products, orders, etc.)
+- 🎯 **HasInventoryLogs Trait**: Easy integration with existing models
+- 🔐 **Authorization**: Built-in policies for secure access control
+- 🌐 **API Ready**: RESTful API endpoints for all resources
+- 📈 **Relation Manager**: Built-in Filament relation manager for inventory logs
+- 🇮🇷 **Persian Support**: Full RTL and Persian language support
 
 ## Installation
 
-You can install the package via composer:
+### 1. Require the package via Composer
 
 ```bash
 composer require mortezaa97/inventories
 ```
 
-## Usage
+### 2. Register the Plugin
+
+In your `app/Providers/Filament/AdminPanelServiceProvider.php`:
 
 ```php
-// Usage description here
+use Mortezaa97\Inventories\InventoriesPlugin;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->plugins([
+            InventoriesPlugin::make(),
+        ]);
+}
 ```
 
-### Testing
+### 3. Run Migrations
+
+```bash
+php artisan migrate
+```
+
+### 4. Clear Caches
+
+```bash
+php artisan config:clear
+php artisan cache:clear
+```
+
+## Configuration
+
+Publish the configuration file:
+
+```bash
+php artisan vendor:publish --tag="inventories-config"
+```
+
+Publish migrations:
+
+```bash
+php artisan vendor:publish --tag="inventories-migrations"
+```
+
+## Usage
+
+See [PLUGIN_USAGE.md](PLUGIN_USAGE.md) for detailed usage instructions.
+
+## Quick Example
+
+```php
+use Mortezaa97\Inventories\Models\Inventory;
+use Mortezaa97\Inventories\Traits\HasInventoryLogs;
+
+// Add trait to your model
+class Product extends Model
+{
+    use HasInventoryLogs;
+}
+
+// Create inventory
+$inventory = Inventory::create([
+    'name' => 'Main Warehouse',
+    'count' => 100,
+    'created_by' => auth()->id(),
+]);
+
+// Increase inventory
+$product->increaseInventory($inventory->id, 50);
+
+// Decrease inventory
+$product->decreaseInventory($inventory->id, 10);
+
+// Get all logs
+$logs = $product->inventoryLogs;
+```
+
+## Available Models
+
+### Inventory
+- Tracks stock levels
+- Has many inventory logs
+- Soft deletable
+
+### InventoryLog
+- Records all changes
+- Polymorphic relationship to any model
+- Tracks increase/decrease operations
+- Soft deletable
+
+## Available Trait
+
+### HasInventoryLogs
+
+Add inventory tracking to any model:
+
+```php
+use Mortezaa97\Inventories\Traits\HasInventoryLogs;
+
+class YourModel extends Model
+{
+    use HasInventoryLogs;
+    
+    // Available methods:
+    // - inventoryLogs()
+    // - addInventoryLog()
+    // - increaseInventory()
+    // - decreaseInventory()
+    // - inventoryLogsFor()
+}
+```
+
+## API Routes
+
+- `/api/inventories` - Inventory CRUD
+- `/api/inventory-logs` - Inventory Log CRUD
+
+## Testing
 
 ```bash
 composer test
 ```
 
-### Changelog
+## Changelog
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
 ## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-### Security
+## Security Vulnerabilities
 
-If you discover any security related issues, please email mortezajafari76@gmail.com instead of using the issue tracker.
+Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
 
 ## Credits
 
--   [morteza jafari](https://github.com/mortezaa97)
--   [All Contributors](../../contributors)
+- [mortezaa97](https://github.com/mortezaa97)
 
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
-
-## Laravel Package Boilerplate
-
-This package was generated using the [Laravel Package Boilerplate](https://laravelpackageboilerplate.com).
